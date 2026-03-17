@@ -28,7 +28,6 @@ delivery-app/
 ```
 
 ---
-
 ## 🚀 Lancer en Local
 
 ### Option 1 — Python (recommandé, zéro installation)
@@ -200,3 +199,53 @@ L'app se lance alors en plein écran comme une app native.
 - Google Maps Directions API (liens natifs, sans clé API)
 - Vibration API (haptic feedback)
 - PWA (manifest + meta tags)
+
+---
+
+## 🧑‍💻 Vercel deployement config:
+## ⚠️ Root Directory Not Detected on Vercel
+
+If your `index.html` is located inside a subfolder (for example `delivery-app`), Vercel may not automatically detect the correct root directory.
+
+---
+
+## 🔍 Why this happens
+
+By default, Vercel assumes that the project root is the root of your repository.
+
+👉 As a result, Vercel will not automatically find your `index.html` if it is inside a subfolder.
+
+---
+
+## ✅ Solution — Configure the Root Directory
+
+Go to your project settings:
+
+👉 Direct link:  
+https://vercel.com/<YOUR_PROJECT>/<your-app>/settings/build-and-deployment
+
+Or manually:
+
+1. Open your project on Vercel  
+2. Click on **Settings**  
+3. Navigate to **Build and Deployment**
+
+You can also access the section directly:  
+https://vercel.com/abs17s-projects/myzakat/settings/build-and-deployment#root-directory
+
+---
+
+## 🔧 Then configure:
+
+```
+Root Directory: delivery-app
+```
+---
+
+## 💡 Tip
+
+Make sure that:
+
+- The specified folder contains your `index.html`  
+- You redeploy your project after updating the settings
+
