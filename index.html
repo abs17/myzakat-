@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#0d0f12">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>LivrAIson — Gestionnaire de tournées</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+
+  <!-- ════════════════════════════════════════════
+       PAGE: DASHBOARD
+  ════════════════════════════════════════════ -->
+  <div id="page-dashboard" class="page active">
+    <!-- Rendered by Dashboard.render() -->
+    <div style="display:flex;align-items:center;justify-content:center;height:100vh;color:var(--text-muted)">
+      Chargement…
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       PAGE: DELIVERIES
+  ════════════════════════════════════════════ -->
+  <div id="page-deliveries" class="page">
+    <!-- Rendered by DeliveryList.render() -->
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       PAGE: ROADMAP
+  ════════════════════════════════════════════ -->
+  <div id="page-roadmap" class="page">
+    <!-- Rendered by Roadmap.render() -->
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       PAGE: SETTINGS
+  ════════════════════════════════════════════ -->
+  <div id="page-settings" class="page">
+    <!-- Rendered by Settings.render() -->
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       BOTTOM NAVIGATION
+  ════════════════════════════════════════════ -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-nav="dashboard" onclick="App.navigate('dashboard')">
+      <span class="nav-icon">🏠</span>
+      <span class="nav-label">Accueil</span>
+    </button>
+    <button class="nav-item" data-nav="deliveries" onclick="App.navigate('deliveries')">
+      <span class="nav-icon">📦</span>
+      <span class="nav-label">Livraisons</span>
+      <span class="nav-badge" id="deliveries-badge" style="display:none">0</span>
+    </button>
+    <button class="nav-item" data-nav="roadmap" onclick="App.navigate('roadmap')">
+      <span class="nav-icon">🗺️</span>
+      <span class="nav-label">Itinéraire</span>
+    </button>
+    <button class="nav-item" data-nav="settings" onclick="App.navigate('settings')">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-label">Réglages</span>
+    </button>
+  </nav>
+
+  <!-- ════════════════════════════════════════════
+       FAB — Primary Action (Bottom Right)
+  ════════════════════════════════════════════ -->
+  <div class="fab" id="fab-container">
+    <div class="fab-menu" id="fab-menu">
+      <div class="fab-item" onclick="closeFab();App.navigate('roadmap')">
+        <span class="fab-item-icon">🗺️</span> Voir l'itinéraire
+      </div>
+      <div class="fab-item" onclick="closeFab();Modal.open('modal-add-delivery')">
+        <span class="fab-item-icon">➕</span> Nouvelle livraison
+      </div>
+    </div>
+    <button class="fab-main" id="fab-btn" onclick="toggleFab()" aria-label="Actions">
+      <span id="fab-icon">＋</span>
+    </button>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       MODAL: ADD / EDIT DELIVERY
+  ════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-add-delivery" onclick="handleOverlayClick(event, 'modal-add-delivery')">
+    <div class="modal">
+      <div class="modal-handle"></div>
+      <div class="modal-title" id="modal-add-title">Nouvelle livraison</div>
+      <div class="modal-subtitle">Remplissez les informations du destinataire</div>
+
+      <div class="form-group">
+        <label class="form-label">Destinataire *</label>
+        <input class="form-input" id="form-recipient" type="text" placeholder="Nom complet" autocomplete="name">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Téléphone</label>
+        <input class="form-input" id="form-phone" type="tel" placeholder="+33 6 12 34 56 78" autocomplete="tel">
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Adresse *</label>
+        <input class="form-input" id="form-address" type="text" placeholder="Numéro et rue" autocomplete="street-address">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Code postal</label>
+          <input class="form-input" id="form-postcode" type="text" placeholder="94700" maxlength="5">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Ville *</label>
+          <input class="form-input" id="form-city" type="text" placeholder="Maisons-Alfort">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Contenu du colis</label>
+        <input class="form-input" id="form-items" type="text" placeholder="ex: Colis alimentaire — 3 pcs">
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Priorité</label>
+          <select class="form-select" id="form-priority">
+            <option value="normal">Normal</option>
+            <option value="urgent">Urgent</option>
+            <option value="low">Faible</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Horaire prévu</label>
+          <input class="form-input" id="form-scheduled" type="datetime-local">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Notes</label>
+        <textarea class="form-textarea" id="form-notes" placeholder="Instructions, code d'accès, étage..."></textarea>
+      </div>
+
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button class="btn btn-ghost" style="flex:1;justify-content:center" onclick="DeliveryList.resetForm();Modal.close('modal-add-delivery')">
+          Annuler
+        </button>
+        <button class="btn btn-primary" id="modal-add-submit" style="flex:2;justify-content:center" onclick="DeliveryList.submitForm()">
+          ➕ Ajouter
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       MODAL: CONFIRM (dynamic content)
+  ════════════════════════════════════════════ -->
+  <div class="modal-overlay" id="modal-confirm" onclick="handleOverlayClick(event, 'modal-confirm')">
+    <div class="modal confirm-dialog">
+      <!-- Populated dynamically -->
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════
+       TOAST CONTAINER
+  ════════════════════════════════════════════ -->
+  <div id="toast-container"></div>
+
+  <!-- ════════════════════════════════════════════
+       SCRIPTS
+  ════════════════════════════════════════════ -->
+  <script src="js/app.js"></script>
+  <script src="js/dashboard.js"></script>
+  <script src="js/deliveries.js"></script>
+  <script src="js/roadmap.js"></script>
+  <script src="js/settings.js"></script>
+
+  <script>
+    // ── FAB Logic ──────────────────────────────
+    let fabOpen = false;
+
+    function toggleFab() {
+      fabOpen = !fabOpen;
+      document.getElementById('fab-menu').classList.toggle('open', fabOpen);
+      document.getElementById('fab-icon').textContent = fabOpen ? '✕' : '＋';
+      document.getElementById('fab-btn').style.transform = fabOpen ? 'rotate(45deg)' : '';
+      if (fabOpen) Haptic.trigger('light');
+    }
+
+    function closeFab() {
+      fabOpen = false;
+      document.getElementById('fab-menu').classList.remove('open');
+      document.getElementById('fab-icon').textContent = '＋';
+      document.getElementById('fab-btn').style.transform = '';
+    }
+
+    // Close FAB on outside click
+    document.addEventListener('click', (e) => {
+      if (fabOpen && !document.getElementById('fab-container').contains(e.target)) {
+        closeFab();
+      }
+    });
+
+    // ── Modal overlay tap-to-close ─────────────
+    function handleOverlayClick(e, modalId) {
+      if (e.target.id === modalId) {
+        Modal.close(modalId);
+        if (modalId === 'modal-add-delivery') DeliveryList.resetForm();
+      }
+    }
+
+    // ── Keyboard: ESC closes modals ────────────
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        Modal.closeAll();
+        DeliveryList.resetForm();
+        closeFab();
+      }
+    });
+
+    // ── Boot ───────────────────────────────────
+    document.addEventListener('DOMContentLoaded', () => {
+      App.init();
+    });
+  </script>
+</body>
+</html>
